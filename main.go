@@ -27,11 +27,12 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 			break
 		}
 
-		clean_string := line[:len(line)-1]
+		//Strip newline and carriage return on windows
+		clean_string := strings.TrimSpace(line)
 
 		words := strings.Split(clean_string, " ")
 
-		if len(words) > 3 {
+		if len(words) > 3 || len(words) < 2 {
 			fmt.Fprintf(conn, "ERROR: Bad format.\n")
 			continue
 		}
