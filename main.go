@@ -39,11 +39,21 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 
 		switch command := words[0]; command {
 		case "SET":
+			if len(words) != 3 {
+				fmt.Fprintf(conn, "ERROR: Bad format.\n")
+				continue
+			}
+
 			mu.Lock()
 			db[words[1]] = words[2]
 			fmt.Fprintf(conn, "Value set!\n")
 			mu.Unlock()
 		case "GET":
+			if len(words) != 2 {
+				fmt.Fprintf(conn, "ERROR: Bad format.\n")
+				continue
+			}
+
 			mu.RLock()
 
 			if val, ok := db[words[1]]; ok {
@@ -54,6 +64,11 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 
 			mu.RUnlock()
 		case "DEL":
+			if len(words) != 2 {
+				fmt.Fprintf(conn, "ERROR: Bad format.\n")
+				continue
+			}
+
 			mu.Lock()
 			if _, ok := db[words[1]]; ok {
 				delete(db, words[1])
