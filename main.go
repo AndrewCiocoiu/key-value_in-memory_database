@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"net"
 )
@@ -21,8 +23,18 @@ func main() {
 		if err != nil {
 			log.Fatalf("%s\n", err)
 		}
-		connection.Write([]byte("Hello, world!\n"))
+		fmt.Fprintf(connection, "Welcome to Andrew's in-memory DB!\n")
 
+		reader := bufio.NewReader(connection)
+
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				break
+			}
+
+			fmt.Fprintf(connection, "%s", line)
+		}
 		connection.Close()
 	}
 }
