@@ -10,6 +10,8 @@ import (
 const PORT = ":9000"
 
 func handleConnect(conn net.Conn) {
+	defer conn.Close()
+
 	fmt.Fprintf(conn, "Welcome to Andrew's in-memory DB!\n")
 
 	reader := bufio.NewReader(conn)
@@ -22,7 +24,7 @@ func handleConnect(conn net.Conn) {
 
 		fmt.Fprintf(conn, "%s", line)
 	}
-	conn.Close()
+
 }
 
 func main() {
@@ -39,7 +41,8 @@ func main() {
 		connection, err := listener.Accept()
 
 		if err != nil {
-			log.Fatalf("%s\n", err)
+			log.Printf("%s\n", err)
+			continue
 		}
 
 		go handleConnect(connection)
