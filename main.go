@@ -27,9 +27,14 @@ func handleConnect(conn net.Conn, mu sync.RWMutex) {
 			break
 		}
 
-		clean_string := line[:len(line)-3]
+		clean_string := line[:len(line)-1]
 
 		words := strings.Split(clean_string, " ")
+
+		if len(words) > 3 {
+			fmt.Fprintf(conn, "ERROR: Bad format.\n")
+			continue
+		}
 
 		switch command := words[0]; command {
 		case "SET":
