@@ -60,6 +60,7 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 			} else {
 				fmt.Fprintf(conn, "Key does not exist in DB!\n")
 			}
+			mu.Unlock()
 		default:
 			fmt.Fprintf(conn, "ERROR: Unknown command.\n")
 		}
