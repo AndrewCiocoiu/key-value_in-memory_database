@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"strings"
 	"sync"
 )
@@ -32,7 +33,7 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 
 		words := strings.Split(clean_string, " ")
 
-		if len(words) > 3 || len(words) < 2 {
+		if len(words) > 3 {
 			fmt.Fprintf(conn, "ERROR: Bad format.\n")
 			continue
 		}
@@ -76,6 +77,26 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 			} else {
 				fmt.Fprintf(conn, "Key does not exist in DB!\n")
 			}
+			mu.Unlock()
+		case "SAVE":
+			if len(words) != 1 {
+				fmt.Fprintf(conn, "ERROR: Bad format.\n")
+				continue
+			}
+
+			file, err := os.Create("dump.txt")
+			if err != nil {
+				fmt.Fprintf(conn, "There was an error saving!\n%s\n", err)
+				continue
+			}
+
+			mu.Lock()
+
+			for key, val := range db {
+				fmt.Fprintf(file, "%s, %s\n", key, val)
+			}
+			fmt.Fprintf(conn, "Database dumped in dump.txt succesfully!\n")
+
 			mu.Unlock()
 		default:
 			fmt.Fprintf(conn, "ERROR: Unknown command.\n")
