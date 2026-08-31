@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
+	"sync"
 )
+
+var db = make(map[string]string)
+var mu sync.RWMutex
 
 const PORT = ":9000"
 
-func handleConnect(conn net.Conn) {
+func handleConnect(conn net.Conn, mu sync.RWMutex) {
 	defer conn.Close()
 
 	fmt.Fprintf(conn, "Welcome to Andrew's in-memory DB!\n")
@@ -22,7 +27,18 @@ func handleConnect(conn net.Conn) {
 			break
 		}
 
-		fmt.Fprintf(conn, "%s", line)
+		clean_string := line[:len(line)-3]
+
+		words := strings.Split(clean_string, " ")
+
+		switch command := words[0]; command {
+		case "SET":
+		case "GET":
+		case "DEL":
+		default:
+			fmt.Fprintf(conn, "ERROR: Unknown command.\n")
+		}
+
 	}
 
 }
@@ -45,7 +61,7 @@ func main() {
 			continue
 		}
 
-		go handleConnect(connection)
+		go handleConnect(connection, mu)
 
 	}
 }
