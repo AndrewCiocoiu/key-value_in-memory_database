@@ -90,14 +90,16 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 				continue
 			}
 
-			mu.Lock()
+			mu.RLock()
 
 			for key, val := range db {
 				fmt.Fprintf(file, "%s, %s\n", key, val)
 			}
+			file.Close()
+
 			fmt.Fprintf(conn, "Database dumped in dump.txt succesfully!\n")
 
-			mu.Unlock()
+			mu.RUnlock()
 		default:
 			fmt.Fprintf(conn, "ERROR: Unknown command.\n")
 		}
@@ -106,7 +108,34 @@ func handleConnect(conn net.Conn, mu *sync.RWMutex) {
 
 }
 
+func loadDBFromDump() {
+	file, err := os.Open("dump.txt")
+	if err != nil {
+		return
+	}
+
+	reader := bufio.NewScanner(file)
+
+	for reader.Scan() {
+		line := reader.Text()
+		entry := strings.Split(line, ", ")
+
+		db[entry[0]] = entry[1]
+	}
+
+	if err := reader.Err(); err != nil {
+		log.Printf("There was an error restoring the DB. DB will not be restored.\n")
+		db = make(map[string]string)
+		return
+	}
+
+	log.Printf("Loaded Database from disk!\n")
+
+}
+
 func main() {
+
+	loadDBFromDump()
 
 	listener, err := net.Listen("tcp", PORT)
 	if err != nil {
