@@ -119,8 +119,9 @@ func loadDBFromDump() {
 	for reader.Scan() {
 		line := reader.Text()
 		entry := strings.Split(line, ", ")
-
-		db[entry[0]] = entry[1]
+		if len(entry) == 2 {
+			db[entry[0]] = entry[1]
+		}
 	}
 
 	if err := reader.Err(); err != nil {
