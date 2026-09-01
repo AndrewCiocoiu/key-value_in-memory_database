@@ -20,6 +20,7 @@ A custom, Redis-style key-value data store built from scratch over raw TCP socke
 `nc localhost 9000`
 
 4. You can now issue commands directly to the database:
+```
 > Welcome to Andrew's in-memory DB!
 > SET language Go
 > Value set!
@@ -33,7 +34,7 @@ A custom, Redis-style key-value data store built from scratch over raw TCP socke
 > Value set!
 > SAVE
 > Database dumped in dump.txt succesfully!
-
+```
 ### What I learned:
 - Raw TCP Networking - using the `net` package to handle long-lived connection lifecycles instead of simple HTTP requests.
 - Mutexes & Thread Safety - using `sync.RWMutex` to lock and unlock memory safely so concurrent goroutines don't cause panic errors.
